@@ -139,7 +139,10 @@ watch(() => props.start, (s) => void load(s))
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  direction: rtl;       /* keep the tail (repo name) visible when the path is long */
+  /* Left-truncate long paths so the tail (repo name) stays visible, while `plaintext`
+     keeps the bidi order correct so short paths render "/projects", not "projects/". */
+  direction: rtl;
+  unicode-bidi: plaintext;
   text-align: left;
 }
 .rp-up { padding: 4px 10px; font-weight: 700; }
