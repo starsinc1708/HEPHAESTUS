@@ -1,0 +1,21 @@
+name: release-please
+
+# Maintains a "release PR" from Conventional Commits on main: bumps the version
+# (CHANGELOG.md, backend/pyproject.toml, frontend/package.json) and, when that PR is
+# merged, creates the GitHub Release + tag. The docker-publish workflow then builds
+# the image for the new tag.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: googleapis/release-please-action@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
