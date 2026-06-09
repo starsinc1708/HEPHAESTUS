@@ -392,9 +392,10 @@ export default {
       makeActive: 'Make active',
       active: 'active',
       none: 'No repositories. Add one below.',
-      addPlaceholder: '/absolute/path/to/git-repo',
+      orManual: 'Or paste a path manually:',
+      addPlaceholder: '/projects/my-repo',
       add: 'Add repository',
-      addHelp: 'Enter the absolute path to a git repository on this machine. A workspace will be created; data goes to <repo>/.hephaestus/.',
+      addHelp: 'Path to a git repository the server can see. Under Docker, within your mounted folder (e.g. /projects/<repo>), not on your machine. A workspace will be created; data goes to <repo>/.hephaestus/.',
       added: 'Repository added: {name}',
     },
     git: {

@@ -24,6 +24,8 @@ vi.mock('@/api/client', () => ({
     testConnection: vi.fn(),
     // integrations (IntegrationsPanel calls this on mount)
     listIntegrations: vi.fn(),
+    // repo picker (RepoPicker calls this on mount)
+    browseFs: vi.fn(),
   },
 }))
 
@@ -79,6 +81,7 @@ beforeEach(() => {
     default: 'github',
     providers: [{ name: 'github', available: true, capabilities: { issues: true, pullRequests: true } }],
   })
+  ;(api.browseFs as Fn).mockResolvedValue({ ok: true, path: '/projects', parent: '/', entries: [] })
 })
 
 describe('SettingsView connections integration', () => {

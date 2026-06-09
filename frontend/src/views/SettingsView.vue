@@ -6,6 +6,7 @@ import { useWorkspaceStore } from '@/stores/workspace'
 import { useConfigStore } from '@/stores/config'
 import { useToastStore } from '@/stores/toast'
 import HelpHint from '@/components/HelpHint.vue'
+import RepoPicker from '@/components/RepoPicker.vue'
 import ConnectionsManager from '@/components/ConnectionsManager.vue'
 import IntegrationsPanel from '@/components/IntegrationsPanel.vue'
 import AppShell from '@/components/AppShell.vue'
@@ -170,6 +171,8 @@ async function addRepo() {
         </div>
         <div v-if="!ws.workspaces.length" class="muted">{{ t('settings.repo.none') }}</div>
       </div>
+      <RepoPicker v-model="newRepoPath" :busy="busy" />
+      <p class="repo-or">{{ t('settings.repo.orManual') }}</p>
       <div class="add-repo">
         <input v-model="newRepoPath" class="input" :placeholder="t('settings.repo.addPlaceholder')" :disabled="busy" @keyup.enter="addRepo" />
         <button class="btn btn-primary" :disabled="busy || !newRepoPath" @click="addRepo">{{ t('settings.repo.add') }}</button>
@@ -268,6 +271,7 @@ async function addRepo() {
 .ws-meta { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
 .ws-meta .mono { font-size: 11px; overflow: hidden; text-overflow: ellipsis; }
 .badge-active { color: var(--primary); font-size: 11px; text-transform: uppercase; }
+.repo-or { color: var(--muted); font-size: 11px; margin: 0 0 6px; }
 .add-repo { display: flex; align-items: center; gap: 8px; }
 .input { background: var(--panel-2); border: 1px solid var(--border); border-radius: 4px; color: var(--text); font-size: 12px; padding: 6px 10px; outline: none; }
 .input:focus { border-color: var(--primary); }
