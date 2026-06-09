@@ -1,0 +1,64 @@
+name: Bug report
+description: Report a problem with HEPHAESTUS (dashboard, API, or the autonomous loop)
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to file a bug. Please do **not** include API keys,
+        tokens, or other secrets in logs or screenshots.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened?
+      description: A clear description of the bug and what you expected instead.
+      placeholder: When I ... HEPHAESTUS did ... but I expected ...
+    validations:
+      required: true
+  - type: textarea
+    id: repro
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click ...
+        3. See error ...
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Dashboard / UI
+        - Backend / API
+        - Autonomous loop (agents/verify/merge)
+        - Setup / install
+        - Other / not sure
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs / output
+      description: Paste any error output (secrets removed). This will be rendered as code.
+      render: shell
+  - type: input
+    id: version
+    attributes:
+      label: Version / commit
+      placeholder: e.g. 0.1.0 or git short SHA
+  - type: input
+    id: env
+    attributes:
+      label: Environment
+      placeholder: OS, Python version, Node version, agent CLI(s) used
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Confirmation
+      options:
+        - label: I searched existing issues and this is not a duplicate.
+          required: true
+        - label: I removed any secrets (API keys, tokens) from the report.
+          required: true

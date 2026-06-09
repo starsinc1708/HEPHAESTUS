@@ -1,0 +1,40 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Node
+node_modules/
+frontend/dist/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+*.log
+
+# State (runtime, not versioned)
+state/
+
+# Runtime artifacts of THIS repo (the tool writes .hephaestus/ into TARGET repos at runtime;
+# inside its own tree these are test/run leftovers, not source)
+.hephaestus/
+.argus/
+.omo/
+.playwright-mcp/
+uv.lock
+
+# Dev screenshots / scratch artifacts at repo root
+/*.png

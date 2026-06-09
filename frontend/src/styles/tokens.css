@@ -1,0 +1,23 @@
+/* Design tokens — verbatim from dashboard/index.html:8-16 */
+:root {
+  --bg: #0a0a0a;
+  --panel: #131313;
+  --panel-2: #1a1a1a;
+  --panel-3: #202020;
+  --border: #232323;
+  --border-2: #2f2f2f;
+  --primary: #faff69;
+  --on-primary: #0a0a0a;
+  --text: #e6e6e6;
+  --muted: #888;
+  --muted-soft: #7a7a7a;
+  --green: #34d399;
+  --rose: #f87171;
+  --amber: #fbbf24;
+  --blue: #60a5fa;
+  --cyan: #22d3ee;
+  --violet: #a78bfa;
+  --pink: #f472b6;
+  --mono: ui-monospace, "JetBrains Mono", SFMono-Regular, Menlo, Consolas, monospace;
+  --sans: ui-sans-serif, system-ui, -apple-system, "Inter", sans-serif;
+}

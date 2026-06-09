@@ -1,0 +1,6 @@
+# pnpm 10 reads dependency-build-script approvals from here. esbuild and vue-demi
+# need their install scripts to run (native binary / Vue 2-3 entry shim); without
+# this, pnpm 10 aborts the install with ERR_PNPM_IGNORED_BUILDS.
+onlyBuiltDependencies:
+  - esbuild
+  - vue-demi
