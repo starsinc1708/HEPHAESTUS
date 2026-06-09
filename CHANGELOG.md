@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.1...v1.0.2) (2026-06-09)
+
+
+### Features
+
+* **settings:** browse-and-pick repository in Settings (reuse RepoPicker) ([d1a3b58](https://github.com/starsinc1708/HEPHAESTUS/commit/d1a3b584750d5daca8d795e9b6cf0bde0837ddcc))
+
+
+### Miscellaneous Chores
+
+* release 1.0.2 ([f1115bf](https://github.com/starsinc1708/HEPHAESTUS/commit/f1115bffc6346780e9b48881976a30cfbfa149aa))
+
 ## [1.0.1](https://github.com/starsinc1708/HEPHAESTUS/compare/v0.1.0...v1.0.1) (2026-06-09)
 
 
