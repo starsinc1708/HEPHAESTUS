@@ -6,6 +6,7 @@ import { api } from '@/api/client'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { useToastStore } from '@/stores/toast'
 import ConnectionsManager from '@/components/ConnectionsManager.vue'
+import RepoPicker from '@/components/RepoPicker.vue'
 
 const props = defineProps<{ connections: Connection[] }>()
 const emit = defineEmits<{ 'connections-changed': [Connection[]]; skip: [] }>()
@@ -149,6 +150,8 @@ function onSkip() { emit('skip') }
       <section v-else data-test="wiz-step-3" class="wiz-body">
         <h2 id="wiz-title" class="wiz-title">{{ t('wizard.step3.title') }}</h2>
         <p class="wiz-lead">{{ t('wizard.step3.lead') }}</p>
+        <RepoPicker v-model="repoPath" :busy="busy" />
+        <p class="wiz-or">{{ t('wizard.step3.orManual') }}</p>
         <div class="repo-form">
           <input
             v-model="repoPath"
@@ -255,6 +258,7 @@ function onSkip() { emit('skip') }
 .cli-row.off .cli-mark { color: var(--rose, #e53935); }
 .repo-form { display: flex; gap: 8px; }
 .repo-form .input { flex: 1; }
+.wiz-or { color: var(--muted); font-size: 11px; margin: 0 0 6px; }
 .muted { color: var(--muted); }
 .small { font-size: 11px; }
 .mono { font-family: var(--mono); }

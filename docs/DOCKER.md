@@ -109,14 +109,19 @@ are all present.
 
 ### Step 3 — connect a repository
 
-Enter the path **as seen inside the container**, i.e. under `/projects`:
+The wizard shows a **directory browser** of the filesystem the container can see. It starts at
+`/projects` (your mount); open folders to navigate, and pick a git repository (marked **◆ git**)
+or the current folder. You can also paste a path manually.
+
+Either way the path is the one **as seen inside the container**, i.e. under `/projects`:
 
 ```
 /projects/my-repo
 ```
 
 Not the host path (`C:\...` or `/home/you/...`) — the container only sees what you mounted at
-`/projects`.
+`/projects`. If the browser is empty, you didn't mount anything at `/projects` (uncomment the
+volume in `docker-compose.yml`).
 
 ---
 

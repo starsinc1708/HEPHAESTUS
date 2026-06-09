@@ -24,8 +24,12 @@ vi.mock('@/stores/toast', () => ({ useToastStore: () => ({ add: vi.fn() }) }))
 
 type Fn = ReturnType<typeof vi.fn>
 
-// Stub ConnectionsManager so step 1 is controlled purely via the connections prop.
-const STUBS = { ConnectionsManager: { template: '<div data-test="conn-stub" />' } }
+// Stub ConnectionsManager (step 1 controlled via the connections prop) and RepoPicker
+// (step 3 onboarding is driven through the manual path input; the picker has its own spec).
+const STUBS = {
+  ConnectionsManager: { template: '<div data-test="conn-stub" />' },
+  RepoPicker: { template: '<div data-test="repo-picker-stub" />' },
+}
 
 const CONNECTED: Connection = {
   id: 'conn-ok', label: 'DS', provider: 'deepseek', engine: 'claude',

@@ -626,6 +626,21 @@ export interface DirEntry {
   hasChildren: boolean  // has further non-skipped subdirs (expandable)
 }
 
+/** A child directory on the *server* filesystem, for the onboarding repo picker. */
+export interface FsEntry {
+  name: string
+  path: string          // absolute server/container POSIX path (what the picker selects)
+  isGitRepo: boolean    // contains a `.git` → selectable as a repository
+}
+
+/** Response of GET /api/v1/fs/browse — immediate subdirs of a server directory. */
+export interface FsBrowseResponse {
+  ok: boolean
+  path: string              // the resolved directory being listed
+  parent: string | null     // its parent, or null at the filesystem root
+  entries: FsEntry[]
+}
+
 export interface DriverStartOptions {
   maxIter?: number
   dryRun?: boolean

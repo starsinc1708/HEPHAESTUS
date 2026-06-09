@@ -189,6 +189,7 @@ from app.api.v1.connections import router as connections_router  # noqa: E402
 from app.api.v1.costs import router as costs_router  # noqa: E402
 from app.api.v1.decisions import router as decisions_router  # noqa: E402
 from app.api.v1.echo import router as echo_router  # noqa: E402
+from app.api.v1.fs import router as fs_router  # noqa: E402
 from app.api.v1.goals import router as goals_router  # noqa: E402
 from app.api.v1.health import router as health_router  # noqa: E402
 from app.api.v1.ideas import router as ideas_router  # noqa: E402
@@ -218,6 +219,7 @@ app.include_router(scans_router)
 app.include_router(branches_router)
 app.include_router(decisions_router)
 app.include_router(echo_router)
+app.include_router(fs_router)
 app.include_router(agents_router)
 
 # --- Universality routers ---

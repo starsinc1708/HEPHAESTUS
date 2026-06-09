@@ -1,4 +1,4 @@
-import type { EffectiveConfig, StateSnapshot, IterDetails, IterSummary, AgentActivity, BranchActionResponse, ReorderResult, ScanStatus, ScanListItem, ScanFinding, Decision, ParsedEvent, ItemPatch, AddItemRequest, DriverStartOptions, IterReviewsResponse, ScanStartRequest, RepoProfile, ProcessManagerStatus, MergePreflightResponse, PromptSummary, WsPromptDetail, DirEntry, MergeJob, MergeJobStatus, Goal, IntegrationProvider, IntegrationConnectResult, Idea, InsightsSession, AgentJob, VerifyOutcome, ProviderCatalogEntry, CliInfo, Connection, DriverStatus, TaskConversations, ConversationResponse, Worktree, CostSummary, RunSummary } from '@/types/api'
+import type { EffectiveConfig, StateSnapshot, IterDetails, IterSummary, AgentActivity, BranchActionResponse, ReorderResult, ScanStatus, ScanListItem, ScanFinding, Decision, ParsedEvent, ItemPatch, AddItemRequest, DriverStartOptions, IterReviewsResponse, ScanStartRequest, RepoProfile, ProcessManagerStatus, MergePreflightResponse, PromptSummary, WsPromptDetail, DirEntry, MergeJob, MergeJobStatus, Goal, IntegrationProvider, IntegrationConnectResult, Idea, InsightsSession, AgentJob, VerifyOutcome, ProviderCatalogEntry, CliInfo, Connection, DriverStatus, TaskConversations, ConversationResponse, Worktree, CostSummary, RunSummary, FsBrowseResponse } from '@/types/api'
 
 /* ── ApiError class ── */
 export class ApiError extends Error {
@@ -375,4 +375,8 @@ export const api = {
   // Agent Jobs — generic status + result polling
   getAgentJob: (id: string) =>
     request<{ ok: boolean } & AgentJob>('/api/v1/agent-jobs/' + encodeURIComponent(id)),
+
+  // Filesystem browser — list server/container directories for the onboarding repo picker.
+  browseFs: (path = '') =>
+    request<FsBrowseResponse>(`/api/v1/fs/browse?path=${encodeURIComponent(path)}`),
 }
