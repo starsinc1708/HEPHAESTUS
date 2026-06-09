@@ -64,6 +64,15 @@ preflight → prompt → execute → verify → commit → idle
 
 ### Option A — Docker (dashboard + API in one command)
 
+Run the prebuilt image (no build needed):
+
+```bash
+docker run -p 8765:8765 ghcr.io/starsinc1708/hephaestus:latest
+# then open http://localhost:8765
+```
+
+Or build from source with Compose:
+
 ```bash
 git clone https://github.com/starsinc1708/HEPHAESTUS.git
 cd HEPHAESTUS
