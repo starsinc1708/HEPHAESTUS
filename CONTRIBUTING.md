@@ -133,7 +133,9 @@ npx vitest run src/components/__tests__/MyComponent.test.ts
 
 ### Commit Messages
 
-Use clear, descriptive commit messages:
+This project uses **[Conventional Commits](https://www.conventionalcommits.org/)** —
+they drive automated releases via [release-please](https://github.com/googleapis/release-please).
+Use a `type: subject` summary:
 
 ```
 feat: add workspace deletion endpoint
@@ -141,7 +143,20 @@ fix: correct port mismatch in vite proxy config
 docs: rewrite README for current architecture
 refactor: extract phase handlers from FSM monolith
 test: add unit tests for config validation
+ci: cache the pnpm store
+chore: bump dependencies
 ```
+
+How it affects releases (on `main`):
+
+- `fix:` → patch bump (e.g. `0.1.0 → 0.1.1`)
+- `feat:` → minor bump (e.g. `0.1.0 → 0.2.0`)
+- `feat!:` / `fix!:` or a `BREAKING CHANGE:` footer → major bump
+- `docs:`, `ci:`, `chore:`, `refactor:`, `test:` → no version bump (still listed in the changelog)
+
+release-please keeps an open **release PR** that updates `CHANGELOG.md` and the version
+in `backend/pyproject.toml` + `frontend/package.json`. Merging that PR cuts the GitHub
+Release + tag, which builds and publishes the Docker image to GHCR.
 
 ### Pull Request Template
 
