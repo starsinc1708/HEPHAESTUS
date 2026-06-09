@@ -62,27 +62,28 @@ preflight → prompt → execute → verify → commit → idle
 
 ## Quick Start
 
-### Option A — Docker (dashboard + API in one command)
+### Option A — Docker
 
-Run the prebuilt image (no build needed):
+There are **two images**:
 
-```bash
-docker run -p 8765:8765 ghcr.io/starsinc1708/hephaestus:latest
-# then open http://localhost:8765
-```
+- **`ghcr.io/starsinc1708/hephaestus:latest`** — the **dashboard + API** only. Great to try
+  the UI. It does **not** include the agent CLIs, so it can't *run* the loop.
+  ```bash
+  docker run -p 8765:8765 ghcr.io/starsinc1708/hephaestus:latest   # open http://localhost:8765
+  ```
+- **Agent image** (built from `Dockerfile.agent`) — the dashboard **plus** `git`, Node, and the
+  agent CLIs (`claude` / `opencode` / `codex`), so the autonomous loop actually runs. Use this
+  to use the app for real:
+  ```bash
+  git clone https://github.com/starsinc1708/HEPHAESTUS.git && cd HEPHAESTUS
+  docker compose up --build          # builds the agent image; open http://localhost:8765
+  ```
 
-Or build from source with Compose:
+**👉 Full walkthrough — running, mounting repos, and connecting providers (API key *or*
+subscription login) in Docker: [docs/DOCKER.md](docs/DOCKER.md).**
 
-```bash
-git clone https://github.com/starsinc1708/HEPHAESTUS.git
-cd HEPHAESTUS
-docker compose up --build      # then open http://localhost:8765
-```
-
-This serves the dashboard, API, and review/merge UI. To run the autonomous loop you
-also need the agent CLIs (opencode / Claude / Codex) available to the process — see the
-note in the `Dockerfile`. **Read [SECURITY.md](SECURITY.md) before pointing HEPHAESTUS at a
-repository:** agents execute code with the container user's privileges.
+**Read [SECURITY.md](SECURITY.md) before pointing HEPHAESTUS at a repository** — agents execute
+code with the container user's privileges.
 
 ### Option B — from source (~15 minutes to first run)
 
@@ -209,6 +210,7 @@ Once the backend is running, interactive API docs are available:
 | Doc | Description |
 |-----|-------------|
 | [GETTING_STARTED.md](GETTING_STARTED.md) | Detailed setup guide with troubleshooting |
+| [docs/DOCKER.md](docs/DOCKER.md) | Run + use HEPHAESTUS in Docker (repos, provider auth, subscription login) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Development setup, code style, PR process |
 | [SECURITY.md](SECURITY.md) | Security policy + threat model (read before running) |
 | [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md) | Community guidelines |

@@ -1,36 +1,42 @@
-# HEPHAESTUS — one-command dashboard. Build the image and run the API + UI:
+# HEPHAESTUS — run the full app (dashboard + autonomous loop) in one command:
 #
 #   docker compose up --build
 #   # then open http://localhost:8765
 #
-# This serves the dashboard / API / review-merge UI. To run the autonomous loop you
-# also need the agent CLIs (claude / opencode / codex) available to the process — see
-# the note in the Dockerfile and SECURITY.md. Read SECURITY.md before mounting a real
-# repository: agents execute code with the container user's privileges.
+# This builds the **agent image** (Dockerfile.agent) — dashboard + git + Node + the agent
+# CLIs (claude / opencode / codex) — so the loop actually runs. See docs/DOCKER.md for the
+# full walkthrough (mounting repos, connecting providers by API key or subscription login).
+#
+# Read SECURITY.md before mounting a real repository: agents execute code with the
+# container user's privileges.
 
 services:
   hephaestus:
-    build: .
-    image: hephaestus:local
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    image: hephaestus-agent:local
     ports:
       - "8765:8765"
     environment:
       HEPHAESTUS_DASHBOARD_HOST: "0.0.0.0"
       HEPHAESTUS_DASHBOARD_PORT: "8765"
       HEPHAESTUS_LOOP_HOME: "/app"
-      # The repository HEPHAESTUS operates on. Uncomment the matching volume mount below
-      # and point it at a repo you trust (ideally a disposable clone).
-      # HEPHAESTUS_REPO: "/workspace"
-      #
-      # Provider keys / tracker tokens can be injected here or via an `.env` file next
-      # to this compose file (docker compose reads it automatically), e.g.:
+      # Provider API keys can be injected here or via an `.env` file next to this compose
+      # file (docker compose reads it automatically), e.g.:
       # ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+      # (Subscription/login auth instead? See docs/DOCKER.md — `docker exec -it hephaestus
+      #  claude setup-token`, etc. Logins persist in the hephaestus-home volume below.)
     volumes:
-      # Persist workspaces, connections, and run history across restarts.
+      # Workspaces, connections, run history.
       - hephaestus-state:/app/state
-      # The repo HEPHAESTUS should work on (edit the host path; pairs with HEPHAESTUS_REPO above).
-      # - /absolute/path/to/your-repo:/workspace
+      # Agent CLI logins/credentials — keeps a subscription login across `docker rm`.
+      - hephaestus-home:/home/hephaestus
+      # The repositories HEPHAESTUS works on. Uncomment + point at the folder holding your
+      # repo(s); then onboard them in the UI using the in-container path /projects/<repo>.
+      # - /absolute/path/to/your-repos:/projects
     restart: unless-stopped
 
 volumes:
   hephaestus-state:
+  hephaestus-home:

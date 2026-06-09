@@ -1,0 +1,23 @@
+# HEPHAESTUS "agent" image — the dashboard image PLUS git + Node + the agent CLIs
+# (claude / opencode / codex), so the autonomous loop can actually RUN inside the
+# container, not just the dashboard. The base `Dockerfile` stays slim (UI/API only);
+# use this when you want the loop to execute tasks in the container.
+#
+#   docker build -f Dockerfile.agent -t hephaestus-agent:local .
+#   docker run -p 8765:8765 -v hephaestus-state:/app/state \
+#     -v /path/to/your/repos:/projects hephaestus-agent:local
+#
+# Authenticate providers with API keys (env / the dashboard connection form);
+# subscription/login auth (claude /login, codex login) is interactive and not ideal
+# for a headless container. See SECURITY.md before pointing it at a repo.
+FROM ghcr.io/starsinc1708/hephaestus:latest
+
+USER root
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends git curl ca-certificates gnupg \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y --no-install-recommends nodejs \
+    && npm install -g @anthropic-ai/claude-code @openai/codex opencode-ai \
+    && npm cache clean --force \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+USER hephaestus
