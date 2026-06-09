@@ -20,4 +20,13 @@ RUN apt-get update \
     && npm install -g @anthropic-ai/claude-code @openai/codex opencode-ai \
     && npm cache clean --force \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# A mounted repo (bind mount / volume) is owned by a different uid than the container
+# user (hephaestus, 10001), which trips git's "dubious ownership" guard — and that breaks
+# EVERY git operation, so the loop fails to create the per-iteration isolation branch and
+# the task is stuck "queued" forever. Trust mounted repos at the system level (/etc/gitconfig,
+# so it isn't shadowed by the /home/hephaestus volume). Safe here: the operator owns the host
+# and the repos they mount (see SECURITY.md — agents already run with the container user's
+# privileges on the mounted tree).
+RUN git config --system --add safe.directory '*'
 USER hephaestus

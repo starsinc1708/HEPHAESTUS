@@ -155,5 +155,6 @@ live in the named volumes — only removing the volumes resets them.
 | Engine dropdown empty / "install claude/opencode/codex" | You're on the **base** image. Use the **agent** image (`Dockerfile.agent` / `docker compose up --build`). |
 | Subscription connection won't verify | Run the CLI login first: `docker exec -it hephaestus claude setup-token` (or `codex login` / `opencode auth login`). |
 | "repo not found" when onboarding | Use the in-container path `/projects/<repo>`, and make sure that repo is under the host folder you mounted at `/projects`. |
+| Task stuck "queued" / loop log shows `Failed to create branch` / git `detected dubious ownership` | A mounted repo is owned by a different uid than the container user, so git refuses to touch it. Recent images fix this automatically; on an older image run once: `docker exec hephaestus git config --global --add safe.directory '*'` (persists in the `hephaestus-home` volume). |
 | Login lost after recreating the container | Mount `-v hephaestus-home:/home/hephaestus` (Compose does this) so credentials persist. |
 | Dashboard not reachable | `docker logs hephaestus`; confirm `-p 8765:8765` and that the port is free. |
