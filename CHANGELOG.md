@@ -4,6 +4,18 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.1](https://github.com/starsinc1708/HEPHAESTUS/compare/v0.1.0...v1.0.1) (2026-06-09)
+
+
+### Features
+
+* **onboarding:** browse-and-pick repository from the server filesystem ([dc973cd](https://github.com/starsinc1708/HEPHAESTUS/commit/dc973cd3c194271f8311502a7c96ee4e942682a4))
+
+
+### Bug Fixes
+
+* **onboarding:** show full path in repo picker (correct bidi truncation) ([341600c](https://github.com/starsinc1708/HEPHAESTUS/commit/341600cdfb3a149e86d4780bce66bdd0b63ddf01))
+
 ## [Unreleased]
 
 ## [0.1.0] — 2026-06-09
