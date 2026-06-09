@@ -1,0 +1,36 @@
+# HEPHAESTUS — one-command dashboard. Build the image and run the API + UI:
+#
+#   docker compose up --build
+#   # then open http://localhost:8765
+#
+# This serves the dashboard / API / review-merge UI. To run the autonomous loop you
+# also need the agent CLIs (claude / opencode / codex) available to the process — see
+# the note in the Dockerfile and SECURITY.md. Read SECURITY.md before mounting a real
+# repository: agents execute code with the container user's privileges.
+
+services:
+  hephaestus:
+    build: .
+    image: hephaestus:local
+    ports:
+      - "8765:8765"
+    environment:
+      HEPHAESTUS_DASHBOARD_HOST: "0.0.0.0"
+      HEPHAESTUS_DASHBOARD_PORT: "8765"
+      HEPHAESTUS_LOOP_HOME: "/app"
+      # The repository HEPHAESTUS operates on. Uncomment the matching volume mount below
+      # and point it at a repo you trust (ideally a disposable clone).
+      # HEPHAESTUS_REPO: "/workspace"
+      #
+      # Provider keys / tracker tokens can be injected here or via an `.env` file next
+      # to this compose file (docker compose reads it automatically), e.g.:
+      # ANTHROPIC_API_KEY: "${ANTHROPIC_API_KEY:-}"
+    volumes:
+      # Persist workspaces, connections, and run history across restarts.
+      - hephaestus-state:/app/state
+      # The repo HEPHAESTUS should work on (edit the host path; pairs with HEPHAESTUS_REPO above).
+      # - /absolute/path/to/your-repo:/workspace
+    restart: unless-stopped
+
+volumes:
+  hephaestus-state:

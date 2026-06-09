@@ -1,0 +1,60 @@
+[project]
+name = "hephaestus-backend"
+version = "0.1.0"
+description = "HEPHAESTUS — self-hosted autonomous development loop (FastAPI backend + dashboard API)"
+requires-python = ">=3.11"
+license = "MIT"
+authors = [{ name = "HEPHAESTUS contributors" }]
+keywords = ["ai-agents", "autonomous", "developer-tools", "code-generation", "self-hosted"]
+classifiers = [
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Intended Audience :: Developers",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Code Generators",
+]
+dependencies = [
+    "fastapi>=0.115.0,<0.116",
+    "uvicorn[standard]>=0.34.0,<0.35",
+    "pydantic>=2.11,<3",
+    "pydantic-settings>=2.9,<3",
+    "httpx>=0.28,<1",
+    "aiofiles>=24.1,<25",
+    "watchfiles>=1.0,<2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.11,<1",
+    "mypy>=1.15,<2",
+    "pytest>=8.3,<9",
+    "pytest-asyncio>=0.25,<1",
+]
+
+[project.urls]
+Homepage = "https://github.com/starsinc1708/HEPHAESTUS"
+Repository = "https://github.com/starsinc1708/HEPHAESTUS"
+Issues = "https://github.com/starsinc1708/HEPHAESTUS/issues"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 120
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.mypy]
+python_version = "3.12"
+# HEPHAESTUS is developed Windows-first and uses Windows-only APIs (msvcrt file locking,
+# subprocess STARTUPINFO, signal.CTRL_BREAK_EVENT) on runtime-guarded paths. Pin the
+# type-check platform to win32 so results are identical on Windows dev machines and the
+# Linux CI runner (otherwise CI flags those Windows attributes as undefined).
+platform = "win32"
+strict = true
+warn_return_any = true
+disallow_untyped_defs = true
+plugins = ["pydantic.mypy"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"

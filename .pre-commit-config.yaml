@@ -1,0 +1,27 @@
+# Pre-commit hooks for HEPHAESTUS. Install once:  pipx install pre-commit && pre-commit install
+# Run on everything:  pre-commit run --all-files
+#
+# These mirror the fast half of CI (hygiene + ruff). The heavier gates — mypy --strict,
+# vue-tsc, pytest, vitest — run in CI (see .github/workflows/hephaestus-loop-ci.yml) because
+# they need the project's installed toolchains.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-merge-conflict
+      - id: check-yaml
+      - id: check-toml
+      - id: check-json
+      - id: check-added-large-files
+        args: ["--maxkb=512"]
+      - id: detect-private-key
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.11.13
+    hooks:
+      # Lint the backend Python (config is auto-discovered from backend/pyproject.toml).
+      - id: ruff
+        files: ^backend/
+        args: ["check"]

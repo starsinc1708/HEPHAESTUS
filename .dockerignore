@@ -1,0 +1,28 @@
+# VCS & CI
+.git
+.github
+
+# Dependencies & build outputs (rebuilt inside the image)
+**/node_modules
+frontend/dist
+backend/.venv
+backend/venv
+**/.venv
+
+# Python / tooling caches
+**/__pycache__
+**/*.pyc
+**/.pytest_cache
+**/.ruff_cache
+**/.mypy_cache
+
+# Runtime data & secrets (never bake these in)
+.hephaestus
+state
+.omo
+**/.env
+*.log
+
+# Docs / local notes not needed at build time
+docs
+RUNBOOK.md
