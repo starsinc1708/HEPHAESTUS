@@ -2,6 +2,10 @@ name: Publish Docker image
 
 # Builds the SPA + API image and pushes it to GHCR so users can run HEPHAESTUS
 # without building locally:  docker run -p 8765:8765 ghcr.io/starsinc1708/hephaestus
+#
+# NOTE: releases publish the image automatically from release-please.yml (its publish-image
+# job). This workflow is the MANUAL / standalone path: run it via "Run workflow" (optionally
+# pick a tag ref to get semver tags), or it fires when a human pushes a v* tag directly.
 on:
   push:
     tags: ["v*"]

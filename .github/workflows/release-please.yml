@@ -2,8 +2,14 @@ name: release-please
 
 # Maintains a "release PR" from Conventional Commits on main: bumps the version
 # (CHANGELOG.md, backend/pyproject.toml, frontend/package.json) and, when that PR is
-# merged, creates the GitHub Release + tag. The docker-publish workflow then builds
-# the image for the new tag.
+# merged, creates the GitHub Release + tag.
+#
+# When a release is cut, the publish-image job below builds + pushes the Docker image
+# to GHCR **in the same workflow run**. This is deliberate: a tag/release created with
+# the default GITHUB_TOKEN does NOT trigger a separate workflow (GitHub's loop guard),
+# so the old "release tag → docker-publish.yml" hop silently never fired. Building here
+# needs no PAT — GITHUB_TOKEN already has packages:write — and only runs on an actual
+# release, so ordinary pushes to main don't rebuild the image.
 on:
   push:
     branches: [main]
@@ -15,7 +21,57 @@ permissions:
 jobs:
   release-please:
     runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+      major: ${{ steps.release.outputs.major }}
+      minor: ${{ steps.release.outputs.minor }}
+      patch: ${{ steps.release.outputs.patch }}
     steps:
       - uses: googleapis/release-please-action@v4
+        id: release
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-image:
+    needs: release-please
+    if: needs.release-please.outputs.release_created == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release-please.outputs.tag_name }}
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Image metadata (tags + labels)
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          # GHCR image names must be lowercase. Tags come from the release-please
+          # outputs (not the git ref) since this job runs in the release workflow.
+          images: ghcr.io/starsinc1708/hephaestus
+          tags: |
+            type=raw,value=${{ needs.release-please.outputs.major }}.${{ needs.release-please.outputs.minor }}.${{ needs.release-please.outputs.patch }}
+            type=raw,value=${{ needs.release-please.outputs.major }}.${{ needs.release-please.outputs.minor }}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
