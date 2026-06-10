@@ -4,6 +4,23 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.2...v1.0.3) (2026-06-10)
+
+
+### Features
+
+* **verify:** baseline-aware auto-detection (don't gate on a red baseline) ([921df16](https://github.com/starsinc1708/HEPHAESTUS/commit/921df16d54debe5c1532fed9eb39c529157c2003))
+
+
+### Bug Fixes
+
+* **docker:** trust mounted repos so git works (fixes tasks stuck "queued") ([62ede2c](https://github.com/starsinc1708/HEPHAESTUS/commit/62ede2c4d5c1194639ea48e6b30d91790d1898a2))
+
+
+### Miscellaneous Chores
+
+* release 1.0.3 ([0061375](https://github.com/starsinc1708/HEPHAESTUS/commit/0061375c3b8a74038d11f27421bcc5cccf798b3d))
+
 ## [1.0.2](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.1...v1.0.2) (2026-06-09)
 
 
