@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.4](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.3...v1.0.4) (2026-06-10)
+
+
+### Bug Fixes
+
+* **prompts:** resolve prompts under LOOP_HOME, not __file__ (fixes Docker validate crash) ([67d512a](https://github.com/starsinc1708/HEPHAESTUS/commit/67d512ae384bad6e98525a33b51fc87672bca889))
+
 ## [1.0.3](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.2...v1.0.3) (2026-06-10)
 
 
