@@ -64,6 +64,27 @@ def _conflict_repo(tmp_path: pathlib.Path) -> pathlib.Path:
     return r
 
 
+def _clean_repo(tmp_path: pathlib.Path) -> pathlib.Path:
+    """A repo whose branch merges into main with NO conflict (→ AUTO_MERGED path).
+
+    base touches only f.txt; auto/x only ADDS feature.txt; main stays at base."""
+    r = tmp_path / "repo"
+    r.mkdir()
+    _git(r, "init", "-b", "main")
+    _git(r, "config", "user.email", "a@b.c")
+    _git(r, "config", "user.name", "t")
+    (r / ".gitignore").write_text("node_modules/\n")
+    (r / "f.txt").write_text("base\n")
+    _git(r, "add", "-A")
+    _git(r, "commit", "-m", "init")
+    _git(r, "checkout", "-b", "auto/x")
+    (r / "feature.txt").write_text("feat\n")
+    _git(r, "add", "-A")
+    _git(r, "commit", "-m", "feat")
+    _git(r, "checkout", "main")
+    return r
+
+
 # ---------------------------------------------------------------------------
 # Fake verify + fake resolve agent
 # ---------------------------------------------------------------------------
@@ -216,6 +237,43 @@ def test_accept_ff_into_base_and_cleanup(tmp_path, monkeypatch):
     it = next(i for i in _read_state()["items"] if i["id"] == "x")
     assert it["status"] == "merged" and it.get("mergeResolution") == "ai"
     assert MergeJobStore().get(job.id).status.value == "accepted"
+
+
+def test_auto_merge_does_not_commit_untracked_worktree_files(tmp_path, monkeypatch):
+    """Regression: a clean AUTO_MERGED merge must commit ONLY the merge — never untracked
+    files present in the worktree. Real-world trigger: a `frontend/node_modules` SYMLINK that
+    `.gitignore`'s dir-pattern `node_modules/` doesn't match; the old `git add -A` staged it,
+    polluting the merge commit and breaking the later fast-forward checkout."""
+    repo = _clean_repo(tmp_path)
+    ws = _ws_for(repo, monkeypatch, tmp_path)
+
+    # Drop an UNTRACKED file into the merge worktree right after it's created — mirrors the
+    # stray node_modules symlink that appeared in the real repo's worktree.
+    import app.core.git as gitmod
+
+    real_add = gitmod._worktree_add
+
+    def _add_then_pollute(r: str, wt: str, wt_branch: str, base: str) -> bool:
+        ok = real_add(r, wt, wt_branch, base)
+        if ok:
+            (pathlib.Path(wt) / "stray.txt").write_text("untracked junk\n")
+        return ok
+
+    monkeypatch.setattr(gitmod, "_worktree_add", _add_then_pollute)
+
+    runner = MergeJobRunner(ws, run_agent=_resolve_ok, verify=_FakeVerify(ok=True))
+    job = asyncio.run(
+        runner.start(branch="auto/x", push=False, ai_resolve=False, auto_accept=False)
+    )
+    assert job.status is MergeJobStatus.RESOLVED
+    assert job.decision is MergeDecision.AUTO_MERGED
+
+    tracked = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", job.worktree_branch or ""],
+        cwd=repo, capture_output=True, text=True, check=True,
+    ).stdout.splitlines()
+    assert "feature.txt" in tracked          # the real merged change IS committed
+    assert "stray.txt" not in tracked        # the untracked worktree file is NOT
 
 
 def test_reject_discards_worktree_base_untouched(tmp_path, monkeypatch):

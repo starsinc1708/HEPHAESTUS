@@ -291,9 +291,12 @@ class MergeJobRunner:
             job.resolved_files = conflicts
 
         subj = _run(["git", "log", "-1", "--pretty=%s", branch], cwd=repo) or f"merge {branch}"
-        if job.decision is MergeDecision.AUTO_MERGED:
-            _run(["git", "add", "-A"], cwd=wt)
-
+        # AUTO_MERGED: `git merge --no-ff --no-commit` above already staged the FULL merge in
+        # the index — do NOT `git add -A` here. That would also stage UNTRACKED working-tree
+        # files (e.g. a `frontend/node_modules` symlink that `.gitignore`'s dir-pattern
+        # `node_modules/` doesn't catch), polluting the merge commit and breaking the later
+        # fast-forward checkout. (The AI_MERGED path stages the resolver's edits above, guarded
+        # by the out-of-scope check.) Just commit the already-staged merge.
         subprocess.run(
             ["git", "commit", "--no-edit", "-m", f"merge: {subj} (from {branch})"],
             cwd=wt,
