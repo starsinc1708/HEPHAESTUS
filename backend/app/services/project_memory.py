@@ -140,15 +140,45 @@ def read_verify_commands(ws: RepoProfile) -> list[str]:
 
 
 def init_verify_if_empty(ws: RepoProfile) -> bool:
-    """Idempotent: only write verify.md if it has no commands. Returns True if written."""
-    existing = read_verify_commands(ws)
-    if existing:
+    """Idempotent: only write verify.md if it has no commands. Returns True if written.
+
+    Baseline-aware (SMART-VERIFY): detected commands are run once on the clean baseline, and
+    only the GREEN ones become the hard gate (``## commands``). A command that is already red
+    on the untouched tree (pre-existing failing suite, missing infra, platform-mismatched
+    deps) would block every task, so it is recorded under ``## advisory`` instead — non-gating
+    but visible, so the user can fix the baseline/env or promote it back. The diff-scoped test
+    net still guards the test files each change touches."""
+    # Write-once: skip if verify.md is already populated. Guard on the doc itself (not
+    # read_verify_commands) — a baseline-aware run can legitimately produce ZERO gating
+    # commands (all advisory), and that must NOT look "empty" and re-probe every startup.
+    existing_body = read_doc(ws, "verify")
+    if existing_body and "## commands" in existing_body:
         return False
-    from app.services.verify_detect import detect_verify_commands
-    cmds = detect_verify_commands(pathlib.Path(ws.repo_path))
+    from app.services.verify_detect import detect_verify_commands, partition_by_baseline
+    repo = pathlib.Path(ws.repo_path)
+    cmds = detect_verify_commands(repo)
     if not cmds:
         return False
-    verify_body = "## commands\n```sh\n" + "\n".join(cmds) + "\n```\n"
+    timeout = int(getattr(ws, "verify_timeout_sec", 900) or 900)
+    gating, advisory = partition_by_baseline(repo, cmds, timeout_sec=timeout)
+    # A comment placeholder when nothing is green keeps the ```sh``` block non-empty so
+    # read_verify_commands() parses it cleanly (→ no gate, falls back to diff-scoped tests).
+    gating_block = "\n".join(gating) if gating else "# none green on the baseline — see advisory below"
+    verify_body = "## commands\n```sh\n" + gating_block + "\n```\n"
+    if advisory:
+        verify_body += (
+            "\n## advisory\n"
+            "<!-- These commands FAIL on the clean baseline (pre-existing red suite, missing\n"
+            "     infra, or platform-mismatched deps), so HEPHAESTUS does NOT gate on them —\n"
+            "     they would block every task. Fix the baseline/environment and move a command\n"
+            "     up to `## commands` to gate on it. The diff-scoped test net still runs the\n"
+            "     test files each change touches. -->\n"
+            "```sh\n" + "\n".join(advisory) + "\n```\n"
+        )
+        log.warning(
+            "verify auto-detect: %d/%d command(s) fail on baseline → advisory, not gating: %s",
+            len(advisory), len(cmds), ", ".join(advisory),
+        )
     write_doc(ws, "verify", verify_body, source="auto-detect")
     return True
 

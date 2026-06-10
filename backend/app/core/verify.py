@@ -25,6 +25,24 @@ log = logging.getLogger("hephaestus.backend.verify")
 _IS_WIN = sys.platform.startswith("win")
 
 
+def argv_for(cmd: str) -> list[str]:
+    """Resolve a verify command line into an argv list (R5).
+
+    Module-level so the baseline probe (verify_detect.partition_by_baseline) executes
+    commands exactly the way the gate will. Optional ``shell:`` prefix forces shell
+    execution; otherwise the executable is resolved via ``shutil.which`` first so Windows
+    picks up ``.cmd``/``.bat`` shims (npm.cmd / pnpm.cmd)."""
+    stripped = cmd.strip()
+    if stripped.startswith("shell:"):
+        inner = stripped[len("shell:") :].strip()
+        return ["cmd", "/c", inner] if _IS_WIN else ["sh", "-c", inner]
+    argv = shlex.split(stripped, posix=True)
+    if not argv:
+        return []
+    exe = shutil.which(argv[0]) or argv[0]  # picks up npm.cmd/pnpm.cmd on Windows
+    return [exe, *argv[1:]]
+
+
 class VerifyResult(BaseModel):
     ok: bool
     ran: list[str]
@@ -57,15 +75,7 @@ class VerifyRunner:
 
     def _argv_for(self, cmd: str) -> list[str]:
         """Resolve a verify command line into an argv list (R5)."""
-        stripped = cmd.strip()
-        if stripped.startswith("shell:"):
-            inner = stripped[len("shell:") :].strip()
-            return ["cmd", "/c", inner] if _IS_WIN else ["sh", "-c", inner]
-        argv = shlex.split(stripped, posix=True)
-        if not argv:
-            return []
-        exe = shutil.which(argv[0]) or argv[0]  # picks up npm.cmd/pnpm.cmd on Windows
-        return [exe, *argv[1:]]
+        return argv_for(cmd)
 
     async def run(
         self, *, cwd: str, log_path: pathlib.Path, timeout_sec: int

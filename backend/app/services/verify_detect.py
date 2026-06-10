@@ -49,6 +49,44 @@ def detect_verify_commands(repo_path: pathlib.Path) -> list[str]:
     return result
 
 
+def partition_by_baseline(
+    repo_path: pathlib.Path, cmds: list[str], timeout_sec: int = 600
+) -> tuple[list[str], list[str]]:
+    """Split detected verify commands into ``(gating, advisory)`` by running each on the
+    clean baseline tree.
+
+    A command that already FAILS on the untouched repo — a pre-existing red suite, missing
+    infra/services, or a platform-mismatched dependency — can never gate: it would fail
+    every task regardless of the agent's change. Such commands are downgraded to *advisory*
+    (recorded, not gating); commands that pass become the hard gate. The diff-scoped test net
+    (``app.core.diff_tests``) still runs the test files each change touches.
+
+    Synchronous on purpose: this runs once, in the separate orchestrator process, before any
+    iteration, so a blocking probe doesn't touch the dashboard API. Best-effort — a command
+    that errors, is missing, or times out counts as red. Each command is capped at
+    ``timeout_sec`` (never more than 600s) so a hung command can't stall startup."""
+    import subprocess
+
+    from app.core.verify import argv_for
+
+    cap = min(timeout_sec, 600) if timeout_sec and timeout_sec > 0 else 600
+    gating: list[str] = []
+    advisory: list[str] = []
+    for cmd in cmds:
+        argv = argv_for(cmd)
+        if not argv:
+            continue
+        try:
+            rc = subprocess.run(
+                argv, cwd=str(repo_path), capture_output=True, timeout=cap
+            ).returncode
+        except (subprocess.TimeoutExpired, FileNotFoundError, OSError):
+            log.debug("baseline probe failed/timed out for %r", cmd, exc_info=True)
+            rc = 1
+        (gating if rc == 0 else advisory).append(cmd)
+    return gating, advisory
+
+
 def _detect_at(directory: pathlib.Path, cmds: list[str]) -> None:
     """Detect verify commands in a single directory."""
     _detect_npm(directory, cmds)

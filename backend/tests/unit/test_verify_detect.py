@@ -100,8 +100,8 @@ def test_monorepo_subdirs(tmp_path: pathlib.Path) -> None:
 
 def test_init_verify_if_empty(tmp_path: pathlib.Path) -> None:
     from app.models.workspace import AgentsConfig, RepoProfile
-    from app.services.project_memory import init_verify_if_empty, read_verify_commands
-    
+    from app.services.project_memory import init_verify_if_empty, read_doc, read_verify_commands
+
     ws = RepoProfile(
         id="test-ws",
         name="test-ws",
@@ -113,22 +113,26 @@ def test_init_verify_if_empty(tmp_path: pathlib.Path) -> None:
             primary={"provider": "openai", "model": "gpt-4"},
             fallback={"provider": "openai", "model": "gpt-4"},
         ),
-        memory_dir=".hephaestus/memory"
+        memory_dir=".hephaestus/memory",
+        verify_timeout_sec=30,
     )
-    
+
     # Write package.json so detection finds something
     (tmp_path / "package.json").write_text(
         json.dumps({"scripts": {"test": "vitest run"}}),
         encoding="utf-8"
     )
-    
+
     # Initially verify.md does not exist
     assert init_verify_if_empty(ws) is True
-    
-    # Now it exists, commands should match
-    cmds = read_verify_commands(ws)
-    assert cmds == ["npm run test"]
-    
+
+    # Baseline-aware (SMART-VERIFY): `npm run test` can't pass on a bare temp repo (no deps),
+    # so it's recorded as advisory rather than gating every task. No hard-gate commands result.
+    assert read_verify_commands(ws) == []
+    body = read_doc(ws, "verify") or ""
+    assert "## advisory" in body
+    assert "npm run test" in body
+
     # Calling it again should return False (idempotent)
     assert init_verify_if_empty(ws) is False
 
