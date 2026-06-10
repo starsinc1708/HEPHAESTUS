@@ -1,6 +1,6 @@
 {
   "name": "hephaestus-frontend",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "description": "HEPHAESTUS dashboard — Vue 3 SPA for the self-hosted autonomous development loop",
   "license": "MIT",
