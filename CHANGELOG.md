@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format is based on
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project aims to
 follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.5](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.4...v1.0.5) (2026-06-10)
+
+
+### Bug Fixes
+
+* **merge:** don't `git add -A` on a clean merge (stops node_modules pollution) ([3416fa3](https://github.com/starsinc1708/HEPHAESTUS/commit/3416fa36b5dd963edcb4983aede1505e5dc5e56a))
+
 ## [1.0.4](https://github.com/starsinc1708/HEPHAESTUS/compare/v1.0.3...v1.0.4) (2026-06-10)
 
 
