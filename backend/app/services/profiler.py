@@ -8,6 +8,7 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from app.config import LOOP_HOME
 from app.models.workspace import RepoProfile, VerifySource
 from app.services.opencode_runner import AgentRunner
 
@@ -66,8 +67,10 @@ class Profiler:
             log.debug("profiler: detect_tech_stack failed", exc_info=True)
             tech_stack = []
 
-        # Read prompt template from prompts/profiler.md
-        prompt_file = pathlib.Path(__file__).resolve().parents[2] / "prompts" / "profiler.md"
+        # Read prompt template from LOOP_HOME/prompts/profiler.md (repo root in dev,
+        # /app/prompts in the Docker image). Not __file__-relative — that breaks once the
+        # backend is installed as a wheel (the relative depth differs in site-packages).
+        prompt_file = LOOP_HOME / "prompts" / "profiler.md"
         try:
             template = prompt_file.read_text(encoding="utf-8")
         except Exception:

@@ -16,6 +16,7 @@ from typing import TYPE_CHECKING, Protocol
 
 from pydantic import BaseModel
 
+from app.config import LOOP_HOME
 from app.models.validation import LensVerdict, ValidationResult
 
 if TYPE_CHECKING:
@@ -41,7 +42,10 @@ _STRICTNESS_LENSES: dict[str, tuple[list[str], int]] = {
     "disabled": ([], 0),
 }
 
-_PROMPTS_DIR = pathlib.Path(__file__).resolve().parent.parent.parent.parent / "prompts"
+# Prompts ship at LOOP_HOME/prompts (repo root in dev, /app/prompts in the Docker image).
+# Do NOT derive this from __file__ — when the backend is installed as a wheel (site-packages)
+# the relative depth differs and it overshoots to <python_prefix>/prompts, which doesn't exist.
+_PROMPTS_DIR = LOOP_HOME / "prompts"
 
 
 def _effective() -> dict[str, str]:
